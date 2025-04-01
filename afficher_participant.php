@@ -79,15 +79,20 @@ foreach ($results as $row) {
         ];
     }
 
-    if (!empty($row['USER']) && empty($row['DATEANNULEINSCRIPTION'])) {
+    if (!empty($row['USER'])) {
         $activites[$key]['PARTICIPANTS'][] = [
             'USER' => $row['USER'],
             'NOMCOMPTE' => $row['NOMCOMPTE'],
             'PRENOMCOMPTE' => $row['PRENOMCOMPTE'],
             'DATEINSCRIP' => $row['DATEINSCRIP'],
             'NOINSCRIP' => $row['NOINSCRIP'],
+            'DATEANNULEINSCRIPTION' => $row['DATEANNULEINSCRIPTION']
         ];
-        $activites[$key]['PARTICIPANTS_COUNT']++;
+        
+        // Incrémenter le compteur uniquement pour les participants non annulés
+        if (empty($row['DATEANNULEINSCRIPTION'])) {
+            $activites[$key]['PARTICIPANTS_COUNT']++;
+        }
     }
 }
 ?>
@@ -99,6 +104,42 @@ foreach ($results as $row) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Participants</title>
     <link rel="stylesheet" href="css/affiche.css">
+    <style>
+        .cancelled-inscription {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #dc3545;
+            font-style: italic;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        tr.cancelled-row {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        tr.cancelled-row td {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -107,11 +148,11 @@ foreach ($results as $row) {
         <!-- Messages d'alerte -->
         <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
             <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> Le participant a été supprimé avec succès.
+                <i class="fas fa-check-circle"></i> L'inscription du participant a été annulée avec succès.
             </div>
         <?php elseif (isset($_GET['error']) && $_GET['error'] == 1): ?>
             <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i> Une erreur est survenue lors de la suppression du participant.
+                <i class="fas fa-exclamation-circle"></i> Une erreur est survenue lors de l'annulation de l'inscription.
             </div>
         <?php endif; ?>
         
@@ -209,8 +250,10 @@ foreach ($results as $row) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($activite['PARTICIPANTS'] as $participant): ?>
-                                                <tr>
+                                            <?php foreach ($activite['PARTICIPANTS'] as $participant): 
+                                                $isAnnuleeInscription = !empty($participant['DATEANNULEINSCRIPTION']);
+                                            ?>
+                                                <tr class="<?= $isAnnuleeInscription ? 'cancelled-row' : '' ?>">
                                                     <td>
                                                         <?php if (!empty($participant['NOMCOMPTE']) && !empty($participant['PRENOMCOMPTE'])): ?>
                                                             <?= htmlspecialchars($participant['PRENOMCOMPTE'] . ' ' . $participant['NOMCOMPTE']) ?>
@@ -219,17 +262,28 @@ foreach ($results as $row) {
                                                             <?= htmlspecialchars($participant['USER']) ?>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td><?= date('d/m/Y', strtotime($participant['DATEINSCRIP'])) ?></td>
                                                     <td>
-                                                        <form method="POST" action="supprimer_participant.php" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce participant ?');">
-                                                            <input type="hidden" name="noinscrip" value="<?= htmlspecialchars($participant['NOINSCRIP']) ?>">
-                                                            <input type="hidden" name="user" value="<?= htmlspecialchars($participant['USER']) ?>">
-                                                            <input type="hidden" name="codeanim" value="<?= htmlspecialchars($activite['CODEANIM']) ?>">
-                                                            <input type="hidden" name="dateact" value="<?= htmlspecialchars($activite['DATEACT']) ?>">
-                                                            <button type="submit" class="delete-btn">
-                                                                <i class="fas fa-trash-alt"></i> Supprimer
-                                                            </button>
-                                                        </form>
+                                                        <?= date('d/m/Y', strtotime($participant['DATEINSCRIP'])) ?>
+                                                        <?php if ($isAnnuleeInscription): ?>
+                                                            <span class="cancelled-inscription">
+                                                                <i class="fas fa-ban"></i> Annulée le <?= date('d/m/Y', strtotime($participant['DATEANNULEINSCRIPTION'])) ?>
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (!$isAnnuleeInscription): ?>
+                                                            <form method="POST" action="supprimer_participant.php" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette inscription ?');">
+                                                                <input type="hidden" name="noinscrip" value="<?= htmlspecialchars($participant['NOINSCRIP']) ?>">
+                                                                <input type="hidden" name="user" value="<?= htmlspecialchars($participant['USER']) ?>">
+                                                                <input type="hidden" name="codeanim" value="<?= htmlspecialchars($activite['CODEANIM']) ?>">
+                                                                <input type="hidden" name="dateact" value="<?= htmlspecialchars($activite['DATEACT']) ?>">
+                                                                <button type="submit" class="delete-btn">
+                                                                    <i class="fas fa-ban"></i> Annuler
+                                                                </button>
+                                                            </form>
+                                                        <?php else: ?>
+                                                            <span class="action-disabled">Déjà annulée</span>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
