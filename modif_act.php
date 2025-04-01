@@ -110,21 +110,22 @@ $activites = $pdo->query("SELECT a.CODEANIM, a.DATEACT, n.NOMANIM, a.NOMRESP, a.
             </div>
         <?php endif; ?>
         
-        <div class="activity-selector">
+       <div class="activity-selector">
     <h3>Sélectionner une activité à modifier</h3>
     <form method="get" action="modif_act.php" class="selector-form">
-        <select name="activity" id="activity-select">
-            <option value="">Choisir une activité...</option>
-            <?php foreach ($activites as $act): ?>
-                <?php $selected = (isset($_GET['code']) && isset($_GET['date']) && $act['CODEANIM'] == $_GET['code'] && $act['DATEACT'] == $_GET['date']) ? 'selected' : ''; ?>
-                <option value="<?= htmlspecialchars($act['CODEANIM']) . '|' . htmlspecialchars($act['DATEACT']) ?>" <?= $selected ?>>
-                    <?= htmlspecialchars($act['NOMANIM']) ?> - 
-                    <?= date('d/m/Y', strtotime($act['DATEACT'])) ?> 
-                    (<?= htmlspecialchars($act['NOMRESP']) ?> <?= htmlspecialchars($act['PRENOMRESP']) ?>)
-                </option>
-            <?php endforeach; ?>
-        </select>
-        
+        <div class="select-container">
+            <select name="activity" id="activity-select">
+                <option value="">Choisir une activité...</option>
+                <?php foreach ($activites as $act): ?>
+                    <?php $selected = (isset($_GET['code']) && isset($_GET['date']) && $act['CODEANIM'] == $_GET['code'] && $act['DATEACT'] == $_GET['date']) ? 'selected' : ''; ?>
+                    <option value="<?= htmlspecialchars($act['CODEANIM']) . '|' . htmlspecialchars($act['DATEACT']) ?>" <?= $selected ?>>
+                        <?= htmlspecialchars($act['NOMANIM']) ?> - 
+                        <?= date('d/m/Y', strtotime($act['DATEACT'])) ?> 
+                        (<?= htmlspecialchars($act['NOMRESP']) ?> <?= htmlspecialchars($act['PRENOMRESP']) ?>)
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
     </form>
 </div>
 
@@ -176,16 +177,16 @@ $activites = $pdo->query("SELECT a.CODEANIM, a.DATEACT, n.NOMANIM, a.NOMRESP, a.
             </div>
             
             <div class="form-row">
-                <div class="form-group">
-                    <label for="nomresp">Nom du responsable:</label>
-                    <input type="text" name="nomresp" id="nomresp" value="<?= htmlspecialchars($activity['NOMRESP']) ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="prenomresp">Prénom du responsable:</label>
-                    <input type="text" name="prenomresp" id="prenomresp" value="<?= htmlspecialchars($activity['PRENOMRESP']) ?>" required>
-                </div>
-            </div>
+    <div class="form-group">
+        <label for="nomresp">Nom du responsable:</label>
+        <input type="text" name="nomresp" id="nomresp" value="<?= htmlspecialchars($activity['NOMRESP']) ?>" readonly class="readonly-field">
+    </div>
+    
+    <div class="form-group">
+        <label for="prenomresp">Prénom du responsable:</label>
+        <input type="text" name="prenomresp" id="prenomresp" value="<?= htmlspecialchars($activity['PRENOMRESP']) ?>" readonly class="readonly-field">
+    </div>
+</div>
             
             <div class="form-actions">
                 <button type="submit" name="modifier_activite" class="submit-btn">
