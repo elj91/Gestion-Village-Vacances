@@ -1,27 +1,32 @@
 <?php
-require 'config/db.php'; // Inclure la connexion à la base de données
+require 'config/db.php';
+include 'header.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['noinscrip'])) {
-    // Récupérer le numéro d'inscription à supprimer
+// Vérifier si les données du formulaire sont présentes
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['noinscrip'])) {
     $noinscrip = $_POST['noinscrip'];
-
-    // Préparer la requête pour supprimer l'inscription
-    $sql = "DELETE FROM INSCRIPTION WHERE NOINSCRIP = :noinscrip";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':noinscrip', $noinscrip, PDO::PARAM_INT);
-
-    if ($stmt->execute()) {
-        // Rediriger vers la page avec un message de succès
+    $user = $_POST['user'];
+    $codeanim = $_POST['codeanim'];
+    $dateact = $_POST['dateact'];
+    
+    // Modifier la requête pour mettre à jour la date d'annulation au lieu de supprimer
+    $today = date('Y-m-d'); // Date du jour
+    
+    $stmt = $pdo->prepare("UPDATE INSCRIPTION SET DATEANNULE = ? WHERE NOINSCRIP = ?");
+    $result = $stmt->execute([$today, $noinscrip]);
+    
+    if ($result) {
+        // Redirection avec message de succès
         header("Location: afficher_participant.php?success=1");
-        exit();
+        exit;
     } else {
-        // Rediriger avec un message d'erreur si la suppression échoue
+        // Redirection avec message d'erreur
         header("Location: afficher_participant.php?error=1");
-        exit();
+        exit;
     }
 } else {
-    // Si la requête n'est pas une POST ou que le paramètre noinscrip n'est pas défini
+    // Redirection si les données ne sont pas valides
     header("Location: afficher_participant.php");
-    exit();
+    exit;
 }
+?>
