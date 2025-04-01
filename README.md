@@ -45,7 +45,6 @@ Vous pouvez tester l'application avec les identifiants suivants :
 | 👑 Administrateur | `ej` | `elyeselyes` | Accès complet au système |
 | 👨‍💼 Encadrant | `mh` | `azerty` | Gestion des activités et animations |
 | 🏄‍♂️ Vacancier | `aa` | `aa` | Consultation et inscription aux activités |
-| 🏄‍♀️ Vacancier | `op` | `op` | Consultation et inscription aux activités |
 
 ## 🖥️ Technologies utilisées
 
@@ -58,7 +57,7 @@ Vous pouvez tester l'application avec les identifiants suivants :
 
 1. Clonez ce dépôt sur votre serveur web
    ```
-   git clone https://github.com/votre-nom/vva-projet.git
+   git clone https://github.com/elj91/gestion-village-vacances.git
    ```
 2. Importez la base de données depuis le fichier `database.sql`
 3. Configurez la connexion à la base de données dans `config/db.php`
@@ -69,14 +68,9 @@ Vous pouvez tester l'application avec les identifiants suivants :
 Une version de démonstration est disponible à l'adresse suivante :
 **[http://elj.wuaze.com](http://elj.wuaze.com)**
 
-## 📱 Captures d'écran
-
-![Capture d'écran de la page d'accueil](https://placeholder.com/wp-content/uploads/2018/10/placeholder-1024x683.png)
-![Capture d'écran des activités](https://placeholder.com/wp-content/uploads/2018/10/placeholder-1024x683.png)
-
 ## 👥 Auteur
 
-Projet développé par [Votre Nom]
+Projet développé par JAFFEL Elyes
 
 ---
 
