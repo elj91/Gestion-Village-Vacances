@@ -95,6 +95,27 @@ foreach ($results as $row) {
         }
     }
 }
+
+// Tri des activités : d'abord celles avec des participants (par nombre décroissant), puis les autres par date
+uasort($activites, function($a, $b) {
+    // Si une activité a des participants et l'autre non, celle avec des participants vient en premier
+    if ($a['PARTICIPANTS_COUNT'] > 0 && $b['PARTICIPANTS_COUNT'] == 0) {
+        return -1;
+    }
+    if ($a['PARTICIPANTS_COUNT'] == 0 && $b['PARTICIPANTS_COUNT'] > 0) {
+        return 1;
+    }
+    
+    // Si les deux ont des participants, triez par nombre de participants (décroissant)
+    if ($a['PARTICIPANTS_COUNT'] > 0 && $b['PARTICIPANTS_COUNT'] > 0) {
+        if ($a['PARTICIPANTS_COUNT'] != $b['PARTICIPANTS_COUNT']) {
+            return $b['PARTICIPANTS_COUNT'] - $a['PARTICIPANTS_COUNT'];
+        }
+    }
+    
+    // Si les deux n'ont pas de participants ou ont le même nombre, triez par date (décroissant)
+    return strtotime($b['DATEACT']) - strtotime($a['DATEACT']);
+});
 ?>
 
 <!DOCTYPE html>
@@ -138,6 +159,33 @@ foreach ($results as $row) {
         tr.cancelled-row td {
             text-decoration: line-through;
             color: #6c757d;
+        }
+        
+        .action-disabled {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        
+        /* Style pour mettre en évidence les activités avec participants */
+        .activity-card.has-participants {
+            border-left: 4px solid #28a745;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .participant-count {
+            padding: 5px 10px;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .participant-count.active {
+            background-color: #d4edda;
+            color: #155724;
         }
     </style>
 </head>
@@ -195,8 +243,9 @@ foreach ($results as $row) {
             <?php if (count($activites) > 0): ?>
                 <?php foreach ($activites as $key => $activite): 
                     $isAnnulee = !empty($activite['DATEANNULEACT']);
+                    $hasParticipants = $activite['PARTICIPANTS_COUNT'] > 0;
                 ?>
-                    <div class="activity-card <?= $isAnnulee ? 'cancelled' : '' ?>">
+                    <div class="activity-card <?= $isAnnulee ? 'cancelled' : '' ?> <?= $hasParticipants ? 'has-participants' : '' ?>">
                         <?php if ($isAnnulee): ?>
                             <div class="cancelled-badge">
                                 <i class="fas fa-ban"></i> Annulée
@@ -205,7 +254,7 @@ foreach ($results as $row) {
                         
                         <div class="activity-header">
                             <h3 class="activity-title"><?= htmlspecialchars($activite['NOMANIM']) ?></h3>
-                            <div class="participant-count">
+                            <div class="participant-count <?= $hasParticipants ? 'active' : '' ?>">
                                 <i class="fas fa-users"></i> <?= $activite['PARTICIPANTS_COUNT'] ?>
                             </div>
                         </div>
@@ -239,7 +288,7 @@ foreach ($results as $row) {
                                 </button>
                             </div>
                             
-                            <div id="participants-<?= $key ?>" class="participant-list">
+                            <div id="participants-<?= $key ?>" class="participant-list <?= $hasParticipants ? 'auto-expand' : '' ?>">
                                 <?php if (count($activite['PARTICIPANTS']) > 0): ?>
                                     <table class="participant-table">
                                         <thead>
@@ -316,6 +365,16 @@ foreach ($results as $row) {
             const participantList = document.getElementById('participants-' + key);
             participantList.classList.toggle('visible');
         }
+        
+        // Auto-expand la liste des participants pour les activités qui en ont
+        document.addEventListener('DOMContentLoaded', function() {
+            const autoExpandLists = document.querySelectorAll('.participant-list.auto-expand');
+            autoExpandLists.forEach(function(list) {
+                // Si l'activité a des participants, on peut automatiquement afficher la liste
+                // Décommentez la ligne suivante pour activer cette fonctionnalité
+                // list.classList.add('visible');
+            });
+        });
     </script>
     
     <?php include 'footer.php'; ?>
