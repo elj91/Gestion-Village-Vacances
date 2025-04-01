@@ -37,12 +37,7 @@ $pageTitle = "Connexion - VVA";
         <?php if (isset($error)): ?>
             <p><?= $error ?></p>
         <?php endif; ?>
-        <div class="auth-footer">
-            Vous n'avez pas de compte ? 
-            <a href="inscription.php">
-                <button type="button">Créer un compte</button>
-            </a>
-        </div>
+        
     </form>
 </div>
 
