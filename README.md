@@ -59,7 +59,7 @@ Vous pouvez tester l'application avec les identifiants suivants :
    ```
    git clone https://github.com/elj91/gestion-village-vacances.git
    ```
-2. Importez la base de données depuis le fichier `database.sql`
+2. Importez la base de données depuis le fichier `projet1.sql`
 3. Configurez la connexion à la base de données dans `config/db.php`
 4. Accédez à l'application via votre navigateur
 
